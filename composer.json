@@ -1,0 +1,16 @@
+{
+    "name": "mateodioev/http-router",
+    "description": "Simple route in php with support for vars in url",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mateodioev\\HttpRouter\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "mateodioev/string-vars": "^1.2",
+        "ralouphie/getallheaders": "^3.0"
+    }
+}
