@@ -67,10 +67,12 @@ final class Request
 
     /**
      * Get param from uri
+     * @param bool $getAll If value is true return all params if name not exists
      */
-    public function param(string $name): mixed
+    public function param(string $name, bool $getAll = false): mixed
     {
-        return $this->route->params()[$name] ?? null;
+        return $this->params[$name]
+            ?? ($getAll ? $this->params : null);
     }
 
     /**

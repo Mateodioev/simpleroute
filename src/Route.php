@@ -31,7 +31,7 @@ class Route
      */
     public function params(string $uri = ''): array
     {
-        if (!empty($this->params)) {
+        if (empty($this->params)) {
             $this->params = $this->vars->match($uri, true);
         }
 
