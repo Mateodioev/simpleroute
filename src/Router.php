@@ -3,9 +3,8 @@
 namespace Mateodioev\HttpRouter;
 
 use Closure;
-use Mateodioev\HttpRouter\exceptions\HttpNotFoundException;
-use Mateodioev\HttpRouter\exceptions\InvalidReturnException;
-use Mateodioev\HttpRouter\exceptions\RequestException;
+use Mateodioev\HttpRouter\exceptions\{HttpNotFoundException, InvalidReturnException, RequestException};
+use Mateodioev\HttpRouter\Server\{NativeServer, Server};
 
 class Router
 {
@@ -20,13 +19,13 @@ class Router
      */
     protected string $baseRoute = '';
 
-    protected NativeServer $server;
+    protected Server $server;
 
     public function __construct()
     {
         // Initialize routes array
         foreach (HttpMethods::cases() as $method) $this->routes[$method->value] = [];
-        $this->server = new NativeServer();
+        $this->server = Container::singleton(NativeServer::class);
     }
 
     /**
@@ -57,7 +56,7 @@ class Router
 
         $request->setRoute($route);
         $response = $action($request); // Execute action
-        assert($response instanceof Response, new InvalidReturnException('Action must return a Response instance'));
+        assert($response instanceof Response, new InvalidReturnException('Action must return a ' . Response::class . ' instance'));
 
         $this->send($response);
     }
@@ -87,6 +86,17 @@ class Router
         // reset base uri
         $this->baseRoute = $currentBaseRoute;
 
+        return $this;
+    }
+
+    /**
+     * Handle all methods
+     */
+    public function all(string $uri, Closure $action): static
+    {
+        foreach (HttpMethods::cases() as $method) {
+            $this->addRoute($method, $uri, $action);
+        }
         return $this;
     }
 

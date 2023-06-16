@@ -2,6 +2,8 @@
 
 namespace Mateodioev\HttpRouter;
 
+use Mateodioev\HttpRouter\Server\NativeServer;
+
 class Response
 {
     protected int $status = 200;
@@ -62,7 +64,6 @@ class Response
     public function setContent(?string $content = null): static
     {
         $this->content = $content;
-        $this->setHeader('Content-Length', \strlen($content));
         return $this;
     }
 
@@ -80,7 +81,7 @@ class Response
             $this->setHeader('Content-Length', \strlen($this->content()));
         }
 
-        $this->setHeader('X-Powered-By', NativeServer::POWERED_BY);
+        $this->setHeader('X-Powered-By', NativeServer::name());
     }
 
     public static function create(): static
@@ -105,7 +106,7 @@ class Response
     {
         return self::create()
             ->setContentType('application/json')
-            ->setContent(\json_encode($data, JSON_PRETTY_PRINT));
+            ->setContent(\json_encode($data));
     }
 
     /**

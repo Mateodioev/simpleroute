@@ -1,13 +1,14 @@
 <?php
 
-namespace Mateodioev\HttpRouter;
+namespace Mateodioev\HttpRouter\Server;
 
 use Mateodioev\HttpRouter\exceptions\RequestException;
+use Mateodioev\HttpRouter\{Request, HttpMethods, Response};
 
 use function parse_url, file_get_contents;
 use function header, header_remove, http_response_code;
 
-class NativeServer
+class NativeServer implements Server
 {
     const POWERED_BY = 'NativeServer';
 
@@ -93,5 +94,10 @@ class NativeServer
         }
 
         print($response->content());
+    }
+
+    public static function name(): string
+    {
+        return self::POWERED_BY;
     }
 }
