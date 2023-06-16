@@ -40,7 +40,7 @@ class Router
             }
         }
 
-        throw new HttpNotFoundException();
+        throw new HttpNotFoundException($request->uri() . ' not found');
     }
 
     /**

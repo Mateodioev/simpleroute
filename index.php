@@ -17,12 +17,20 @@ $router->post('/', function () {
         ->setHeader('X-message', 'Method POST');
 });
 
-$router->get('/usr/{name}?', function (Request $r) {
-    return Response::json($r->param('name', true));
+// Conditional params
+$router->get('/page/{all:id}?', function (Request $r) {
+    return Response::text($r->param('id') ?? 'default page');
+});
+
+// Mandatory params
+$router->get('/usr/{name}', function (Request $r) {
+    return Response::text('Hello ' . $r->param('name'));
 });
 
 try {
     $router->run();
-} catch (HttpNotFoundException | RequestException $e) {
-    $router->send(Response::text($e->getMessage() ?? '')->setStatus(500));
+} catch (HttpNotFoundException $e) {
+    $router->send(Response::text($e->getMessage() ?? 'Not found')->setStatus(404));
+} catch (RequestException $e) {
+    $router->send(Response::text($e->getMessage() ?? 'Server error')->setStatus(500));
 }

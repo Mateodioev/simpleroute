@@ -71,8 +71,10 @@ final class Request
      */
     public function param(string $name, bool $getAll = false): mixed
     {
-        return $this->params[$name]
-            ?? ($getAll ? $this->params : null);
+        $param =  $this->params[$name] ?? ($getAll ? $this->params : null);
+        if ($param !== null) $param = \urldecode($param);
+
+        return $param;
     }
 
     /**
