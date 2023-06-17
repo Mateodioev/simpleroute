@@ -71,7 +71,10 @@ class Router
      */
     protected function addRoute(HttpMethods $method, string $uri, Closure $action): static
     {
-        $this->routes[$method->value][] = new Route($this->baseRoute . $uri, $action);
+        $uri = $this->baseRoute . '/' . trim($uri, '/');
+        $uri = $this->baseRoute ? rtrim($uri, '/') : $uri;
+
+        $this->routes[$method->value][] = new Route($uri, $action);
         return $this;
     }
 
