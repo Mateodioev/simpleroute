@@ -37,7 +37,7 @@ class NativeServer implements Server
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         if ($uri !== '/') $uri = rtrim($uri, '/');
 
-        return $uri;
+        return \rawurldecode($uri);
     }
 
     /**

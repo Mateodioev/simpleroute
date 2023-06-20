@@ -3,7 +3,10 @@
 namespace Mateodioev\HttpRouter;
 
 use Closure;
-use Mateodioev\StringVars\Matcher as StrMatcher;
+use Mateodioev\StringVars\{
+    Matcher as StrMatcher,
+    Config as StrMatcherConfig
+};
 
 class Route
 {
@@ -13,9 +16,10 @@ class Route
 
     public function __construct(
         protected string $uri,
-        protected Closure $action
+        protected Closure $action,
+        StrMatcherConfig $conf = null
     ) {
-        $this->vars = new StrMatcher($this->uri);
+        $this->vars = new StrMatcher($this->uri, $conf);
     }
 
     /**

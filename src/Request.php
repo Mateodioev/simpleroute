@@ -67,14 +67,20 @@ final class Request
 
     /**
      * Get param from uri
-     * @param bool $getAll If value is true return all params if name not exists
+     * @param string $name Param to get
+     * @param mixed $default If param not found, return this
      */
-    public function param(string $name, bool $getAll = false): mixed
+    public function param(string $name, mixed $default = null): mixed
     {
-        $param =  $this->params[$name] ?? ($getAll ? $this->params : null);
-        if ($param !== null) $param = \urldecode($param);
+        return $this->params[$name] ?? $default;
+    }
 
-        return $param;
+    /**
+     * Get all uri params
+     */
+    public function params(): array
+    {
+        return $this->params;
     }
 
     /**

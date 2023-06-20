@@ -5,6 +5,7 @@ namespace Mateodioev\HttpRouter;
 use Closure;
 use Mateodioev\HttpRouter\exceptions\{HttpNotFoundException, InvalidReturnException, RequestException};
 use Mateodioev\HttpRouter\Server\{NativeServer, Server};
+use Mateodioev\StringVars\Config;
 
 class Router
 {
@@ -21,7 +22,7 @@ class Router
 
     protected Server $server;
 
-    public function __construct()
+    public function __construct(protected ?Config $conf = null)
     {
         // Initialize routes array
         foreach (HttpMethods::cases() as $method) $this->routes[$method->value] = [];
@@ -74,7 +75,13 @@ class Router
         $uri = $this->baseRoute . '/' . trim($uri, '/');
         $uri = $this->baseRoute ? rtrim($uri, '/') : $uri;
 
-        $this->routes[$method->value][] = new Route($uri, $action);
+        $this->routes[$method->value][] = new Route($uri, $action, $this->conf);
+        return $this;
+    }
+
+    public function setBaseRoute(string $baseRoute): static
+    {
+        $this->baseRoute = $baseRoute;
         return $this;
     }
 
