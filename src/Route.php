@@ -2,7 +2,6 @@
 
 namespace Mateodioev\HttpRouter;
 
-use Closure;
 use Mateodioev\StringVars\{
     Matcher as StrMatcher,
     Config as StrMatcherConfig
@@ -14,9 +13,12 @@ class Route
     protected StrMatcher $vars;
     protected array $params = [];
 
+    /**
+     * @param callable $action
+     */
     public function __construct(
         protected string $uri,
-        protected Closure $action,
+        protected mixed $action,
         StrMatcherConfig $conf = null
     ) {
         $this->vars = new StrMatcher($this->uri, $conf);
@@ -61,7 +63,7 @@ class Route
     /**
      * Get action to execute when uri match with endpoint called
      */
-    public function action(): Closure
+    public function action(): callable
     {
         return $this->action;
     }

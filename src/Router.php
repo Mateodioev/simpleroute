@@ -2,7 +2,6 @@
 
 namespace Mateodioev\HttpRouter;
 
-use Closure;
 use Mateodioev\HttpRouter\exceptions\{HttpNotFoundException, InvalidReturnException, RequestException};
 use Mateodioev\HttpRouter\Server\{NativeServer, Server};
 use Mateodioev\StringVars\Config;
@@ -68,9 +67,9 @@ class Router
     }
 
     /**
-     * @param Closure $action Function to execute when uri match with endpoint called, receives a Request instance as parameter
+     * @param callable $action Function to execute when uri match with endpoint called, receives a Request instance as parameter
      */
-    protected function addRoute(HttpMethods $method, string $uri, Closure $action): static
+    protected function addRoute(HttpMethods $method, string $uri, callable $action): static
     {
         $uri = $this->baseRoute . '/' . trim($uri, '/');
         $uri = $this->baseRoute ? rtrim($uri, '/') : $uri;
@@ -85,7 +84,7 @@ class Router
         return $this;
     }
 
-    public function mount(string $uri, Closure $fn): static
+    public function mount(string $uri, callable $fn): static
     {
         // Get current base route
         $currentBaseRoute = $this->baseRoute;
@@ -102,7 +101,7 @@ class Router
     /**
      * Handle all methods
      */
-    public function all(string $uri, Closure $action): static
+    public function all(string $uri, callable $action): static
     {
         foreach (HttpMethods::cases() as $method) {
             $this->addRoute($method, $uri, $action);
@@ -110,27 +109,27 @@ class Router
         return $this;
     }
 
-    public function get(string $uri, Closure $action): static
+    public function get(string $uri, callable $action): static
     {
         return $this->addRoute(HttpMethods::GET, $uri, $action);
     }
 
-    public function post(string $uri, Closure $action): static
+    public function post(string $uri, callable $action): static
     {
         return $this->addRoute(HttpMethods::POST, $uri, $action);
     }
 
-    public function put(string $uri, Closure $action): static
+    public function put(string $uri, callable $action): static
     {
         return $this->addRoute(HttpMethods::PUT, $uri, $action);
     }
 
-    public function patch(string $uri, Closure $action): static
+    public function patch(string $uri, callable $action): static
     {
         return $this->addRoute(HttpMethods::PATCH, $uri, $action);
     }
 
-    public function delete(string $uri, Closure $action): static
+    public function delete(string $uri, callable $action): static
     {
         return $this->addRoute(HttpMethods::DELETE, $uri, $action);
     }
