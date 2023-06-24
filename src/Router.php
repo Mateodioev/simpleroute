@@ -17,14 +17,15 @@ class Router
     /**
      * Current base route used for (sub) route mounting
      */
-    protected string $baseRoute = '';
+    protected ?string $baseRoute = null;
 
     protected Server $server;
 
     public function __construct(protected ?Config $conf = null)
     {
         // Initialize routes array
-        foreach (HttpMethods::cases() as $method) $this->routes[$method->value] = [];
+        foreach (HttpMethods::cases() as $method)
+            $this->routes[$method->value] = [];
         $this->server = Container::singleton(NativeServer::class);
     }
 
@@ -51,8 +52,8 @@ class Router
     {
 
         $request = $this->server->request();
-        $route   = $this->resolve($request);
-        $action  = $route->action();
+        $route = $this->resolve($request);
+        $action = $route->action();
 
         $request->setRoute($route);
         $response = $action($request); // Execute action
@@ -132,5 +133,66 @@ class Router
     public function delete(string $uri, callable $action): static
     {
         return $this->addRoute(HttpMethods::DELETE, $uri, $action);
+    }
+
+    /**
+     * Map static files
+     * @var string $baseUri URI to map the files
+     * @var string $path Directory
+     * @var HttpMethods[] $methods
+     */
+    public function static(string $baseUri, string $path, array $methods = [HttpMethods::GET]): static
+    {
+        if (!\is_dir($path))
+            throw new RequestException('Invalid static path', 500);
+
+        $path = rtrim($path, '/') . '/'; // Path always end "/"
+        $files = $this->getFiles($path);
+        $fileParam = 'fileName'; // file param
+
+        $uri = rtrim($baseUri, '/') . '/{' . $fileParam . '}';
+
+        $fn = function (Request $r) use ($fileParam, $files, $uri): Response {
+            $fileName = $r->param($fileParam, '""');
+
+            if (in_array($fileName, array_keys($files)) === false) // File not found
+                return Response::text('File not found')->setStatus(404);
+
+            // Render the file
+            return $this->renderFile($files[$fileName]);
+        };
+
+        // Register the routes
+        array_map(function (HttpMethods $method) use ($uri, $fn) {
+            $this->addRoute($method, $uri, $fn);
+        }, $methods);
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, string> basename => full path
+     */
+    private function getFiles(string $path): array
+    {
+        $_files = glob($path . '*');
+        $files = [];
+
+        foreach ($_files as $value) {
+            $files[\basename($value)] = $value;
+        }
+
+        return $files;
+    }
+
+    private function renderFile(string $file): Response
+    {
+        $loader = static function (string $file) {
+            return \file_get_contents($file);
+        }; // Delete Router context
+
+        return Response::create()
+            ->setContentType(\mime_content_type($file))
+            ->setContent($loader($file));
     }
 }
