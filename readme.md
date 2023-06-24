@@ -27,6 +27,36 @@ $router->myHttpMethod($uri, $callback);
 - `$uri` is the path of the endpoint.
 - `$callback` is the function that will be executed when the endpoint is requested. Each callback (action) must return an instance of the Mateodioev\HttpRouter\Response class or an InvalidReturnException will be thrown.
 
+#### Static files
+You can map all static files in a directory with the `static` method.
+
+```php
+$router->static($baseUri, $path, $methods);
+// Default methods are GET
+```
+
+Example:
+
+```bash
+tree
+```
+```text
+.
+├── index.php
+└── styles.css
+
+1 directory, 2 files
+```
+
+```php
+$router->static('/docs', 'public/');
+```
+Now you can reach this uris
+
+- /docs/index.php
+- /docs/styles.css
+
+
 #### Handling all HTTP methods
 You can use the `Router::all` method to handle all HTTP methods with one callback.
 
@@ -62,7 +92,8 @@ You can get all data from the request with the following methods:
 - `Request::method()` returns the HTTP method of the request.
 - `Request::uri()` returns the URI of the request.
 - `Request::uri()` returns the URL of the request.
-- `Request::param($name, $getAll = false)` returns the value of the parameter with the name `$name` or null if the parameter is not present. If `$getAll` is true, the method returns an array with all the values of the parameter.
+- `Request::param($name, $default = null)` returns the value of the parameter with the name `$name` or null if the parameter is not present.
+- `Request::params()` return al the request URI parameters.
 - `Request::headers()` returns an array with all the headers of the request.
 - `Request::body()` returns the body of the request (from [php://input](https://www.php.net/manual/en/wrappers.php.php)).
 - `Request::data()` returns an array with all the data of the request. Use this when Content-Type is _application/x-www-form-urlencoded_ or _multipart/form-data_.
