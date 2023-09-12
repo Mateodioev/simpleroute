@@ -50,18 +50,37 @@ class Router
      */
     public function run(): void
     {
-
         $request = $this->server->request();
-        $route = $this->resolve($request);
-        $action = $route->action();
+        $route   = $this->resolve($request);
+        $action  = $route->action();
 
         $request->setRoute($route);
-        $response = $action($request); // Execute action
-        assert($response instanceof Response, new InvalidReturnException('Action must return a ' . Response::class . ' instance'));
+        $response = $this->buildCustomResponse($action($request)); // Execute action
 
         $this->send($response);
     }
 
+    /**
+     * Create new response result from custom response
+     */
+    private function buildCustomResponse(mixed $response): Response
+    {
+        if ($response instanceof Response) {
+            return $response;
+        } elseif (\is_string($response)) {
+            return Response::text($response);
+        } elseif (\is_array($response)) {
+            return Response::json($response);
+        } elseif (\is_object($response)) {
+            return Response::json((array)$response);
+        } else {
+            throw new InvalidReturnException('Action must return a ' . Response::class . ' instance');
+        }
+    }
+
+    /**
+     * Send response to the server
+     */
     public function send(Response $response): void
     {
         $this->server->send($response);
